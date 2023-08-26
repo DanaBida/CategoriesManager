@@ -28,6 +28,6 @@ async def upload_file(category_name: str, file: UploadFile = File(...)):
         return JSONResponse(content={f"message": "Failed to upload file, {e}"}, status_code=400)
 
 
-@router.get("/sumType")
+@router.get("/sum")
 def sum_type(type: str):
     return categoriesService.sumAllNumbersInTypeCategories(type)
