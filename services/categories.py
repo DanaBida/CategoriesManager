@@ -7,7 +7,7 @@ from common.errors import NotFoundError
 
 
 class CategoriesService:
-    # Refactor Note: Use sql injection for further tests
+    # Refactor Note: Use sql injection (DA) for further tests
     def __init__(self):
         self.categoriesDA = CategoriesDataAccess()
         self.directoryDA = DirectoryDataAccess(FileStorageConfig["path"])
@@ -22,7 +22,7 @@ class CategoriesService:
         categoryInfo = self.categoriesDA.getCategoryInfo(categoryName)
         if categoryInfo is None:
             raise NotFoundError(f"Category '{categoryName}' not found")
-        # store multiple files with same name
+        # random uuid to store multiple files with same name
         fileName = str(uuid.uuid4())+'.xlsx'
         dirName = os.path.join(categoryInfo["type"], categoryName)
         self.directoryDA.storeFileInDirectory(dirName, fileName, fileContent)
@@ -42,9 +42,15 @@ class CategoriesService:
         return totalSum
 
     def getContainsTermCategoriesRegions(self, term):
+        # Refactor Note: select from DB the categories, and extract their regions
+        categoriesInfo = self.getCategories()
+        if not categoriesInfo:
+            return []
         categoriesContainsTerm = self.directoryDA.getSubDirectoryNamesContainsTermAtLeastInOneFile(
             term)
-        categoriesInfo = self.getCategories()
+        # extract categories without info
+        categoriesContainsTerm = list(
+            filter(lambda category: category in categoriesInfo, categoriesContainsTerm))
         categoriesContainsTermRegions = map(
             lambda category: categoriesInfo[category]["region"],
             categoriesContainsTerm)
