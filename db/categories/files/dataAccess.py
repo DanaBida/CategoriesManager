@@ -8,6 +8,7 @@ class FilesDataAccess:
         file = BytesIO(content)
         os.makedirs(fullDirPath, exist_ok=True)
         filePath = os.path.join(fullDirPath, fileName)
+        #Refactor Note: use streams for large files + store in s3
         with open(filePath, "wb") as outputFile:
             outputFile.write(file.read())
         file.close()
