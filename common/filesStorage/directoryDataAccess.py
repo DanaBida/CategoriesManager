@@ -8,6 +8,7 @@ import openpyxl
 #   Then, this class implementation would be changed to BigQueryDataAccess.
 # 3. This class coupled with the fact that the files are in excel formate.
 #   Some other classes could extend this class and implement accordingly the logic of achieve file row.
+# 4. Add error handling
 
 
 class DirectoryDataAccess:

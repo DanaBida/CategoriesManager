@@ -41,6 +41,7 @@ class CategoriesService:
 
         return totalSum
 
+    # Refactor Note: Add error handling
     def getContainsTermCategoriesRegions(self, term):
         # Refactor Note: select from DB the categories, and extract their regions
         categoriesInfo = self.getCategories()
