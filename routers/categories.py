@@ -1,3 +1,4 @@
+from typing import List
 from fastapi import APIRouter, File, UploadFile
 from fastapi.responses import JSONResponse
 from common.errors import NotFoundError
@@ -31,3 +32,8 @@ async def upload_file(category_name: str, file: UploadFile = File(...)):
 @router.get("/sum")
 def sum_type(type: str):
     return categoriesService.sumAllNumbersInTypeCategories(type)
+
+
+@router.get("/regions", response_model=List[str])
+def find_regions(search_term: str):
+    return categoriesService.getContainsTermCategoriesRegions(search_term)

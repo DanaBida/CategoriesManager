@@ -1,7 +1,8 @@
 import os
 import uuid
 from db.categories.dataAccess import CategoriesDataAccess
-from db.categories.files.dataAccess import FilesDataAccess
+from common.filesStorage.directoryDataAccess import DirectoryDataAccess
+from db.categories.config import FileStorageConfig
 from common.errors import NotFoundError
 
 
@@ -9,7 +10,7 @@ class CategoriesService:
     # Refactor Note: Use sql injection for further tests
     def __init__(self):
         self.categoriesDA = CategoriesDataAccess()
-        self.filesDA = FilesDataAccess()
+        self.directoryDA = DirectoryDataAccess(FileStorageConfig["path"])
 
     def addCategory(self, categoryName: str, region: str, type: str):
         return self.categoriesDA.addCategory(categoryName, region, type)
@@ -24,19 +25,27 @@ class CategoriesService:
         # store multiple files with same name
         fileName = str(uuid.uuid4())+'.xlsx'
         dirName = os.path.join(categoryInfo["type"], categoryName)
-        self.filesDA.store(dirName, fileName, fileContent)
+        self.directoryDA.storeFileInDirectory(dirName, fileName, fileContent)
 
     def sumAllNumbersInTypeCategories(self, type: str):
         totalSum = 0
 
         def sumRowNumericValues(row):
             nonlocal totalSum
-            print(row)
             numericValues = [
                 value for value in row if isinstance(value, (int, float))]
             totalSum += sum(numericValues)
 
-        self.filesDA.applyHandlerOnDirectoryFilesRows(
+        self.directoryDA.applyHandlerOnDirectoryFilesRows(
             sumRowNumericValues, type)
 
         return totalSum
+
+    def getContainsTermCategoriesRegions(self, term):
+        categoriesContainsTerm = self.directoryDA.getSubDirectoryNamesContainsTermAtLeastInOneFile(
+            term)
+        categoriesInfo = self.getCategories()
+        categoriesContainsTermRegions = map(
+            lambda category: categoriesInfo[category]["region"],
+            categoriesContainsTerm)
+        return categoriesContainsTermRegions
